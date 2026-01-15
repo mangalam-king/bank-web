@@ -2,23 +2,23 @@ body {
   font-family: Arial;
   background: #f2f2f2;
   text-align: center;
-  padding-top: 50px;
+  padding-top: 40px;
 }
 
 input, button {
   padding: 10px;
   margin: 5px;
-  width: 250px;
+  width: 260px;
   font-size: 16px;
 }
 
 button {
-  background: #4CAF50;
+  background: #2e8bff;
   color: white;
   border: none;
   cursor: pointer;
 }
 
 button:hover {
-  background: #45a049;
+  background: #1c6fe0;
 }
