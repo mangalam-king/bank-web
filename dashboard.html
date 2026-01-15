@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Bank Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<h2>Welcome to Your Bank</h2>
+
+<h3>Balance: ₹ <span id="balance">0</span></h3>
+
+<input type="number" id="amount" placeholder="Enter amount"><br>
+
+<button onclick="deposit()">Deposit</button>
+<button onclick="withdraw()">Withdraw</button>
+
+<br><br>
+<button onclick="logout()">Logout</button>
+
+<script src="firebase.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
