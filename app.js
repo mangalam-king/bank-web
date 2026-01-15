@@ -1,136 +1,116 @@
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+import {
+  ref, set, get, update
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+
 // Generate Account Number
 function generateAccountNumber() {
   return "ACC" + Math.floor(100000 + Math.random() * 900000);
 }
 
-// Register
-function register() {
+
+// ================= REGISTER =================
+window.register = function () {
   let name = document.getElementById("name").value;
   let email = document.getElementById("email").value;
   let password = document.getElementById("password").value;
 
+  if (!name || !email || !password) {
+    alert("Fill all fields");
+    return;
+  }
+
   let accNo = generateAccountNumber();
 
-  firebase.auth().createUserWithEmailAndPassword(email, password)
+  createUserWithEmailAndPassword(auth, email, password)
     .then(userCred => {
       let uid = userCred.user.uid;
 
-      firebase.database().ref("users/" + uid).set({
+      set(ref(db, "users/" + uid), {
         name: name,
         email: email,
         account: accNo,
         balance: 0
       });
 
-      firebase.database().ref("accounts/" + accNo).set(uid);
+      set(ref(db, "accounts/" + accNo), uid);
 
-      alert("Account Created! Your Account No: " + accNo);
+      alert("Account Created!\nYour Account Number: " + accNo);
       window.location = "index.html";
     })
     .catch(err => alert(err.message));
-}
+};
 
-// Login
-function login() {
+
+// ================= LOGIN =================
+window.login = function () {
   let email = document.getElementById("email").value;
   let password = document.getElementById("password").value;
 
-  firebase.auth().signInWithEmailAndPassword(email, password)
+  signInWithEmailAndPassword(auth, email, password)
     .then(() => window.location = "dashboard.html")
     .catch(err => alert(err.message));
-}
+};
 
-// Load User Dashboard
-firebase.auth().onAuthStateChanged(user => {
+
+// ================= DASHBOARD =================
+onAuthStateChanged(auth, user => {
   if (user && document.getElementById("balance")) {
-    let ref = firebase.database().ref("users/" + user.uid);
+    let userRef = ref(db, "users/" + user.uid);
 
-    ref.on("value", snap => {
-      let data = snap.val();
+    get(userRef).then(snapshot => {
+      let data = snapshot.val();
       document.getElementById("balance").innerText = data.balance;
       document.getElementById("accno").innerText = data.account;
-    });
-
-    firebase.database().ref("transactions/" + user.uid).on("value", snap => {
-      let history = document.getElementById("history");
-      history.innerHTML = "";
-      snap.forEach(tx => {
-        let li = document.createElement("li");
-        li.innerText = tx.val();
-        history.appendChild(li);
-      });
     });
   }
 });
 
-// Deposit
-function deposit() {
+
+// ================= DEPOSIT =================
+window.deposit = function () {
   updateBalance(true);
-}
+};
 
-// Withdraw
-function withdraw() {
+
+// ================= WITHDRAW =================
+window.withdraw = function () {
   updateBalance(false);
-}
+};
 
-// Update balance function
+
+// ================= UPDATE BALANCE =================
 function updateBalance(isDeposit) {
-  let amt = Number(document.getElementById("amount").value);
-  let user = firebase.auth().currentUser;
-  let ref = firebase.database().ref("users/" + user.uid);
+  let amount = Number(document.getElementById("amount").value);
+  let user = auth.currentUser;
 
-  ref.once("value").then(snap => {
-    let bal = snap.val().balance;
-    let newBal = isDeposit ? bal + amt : bal - amt;
+  if (!amount || amount <= 0) return alert("Enter valid amount");
+
+  let userRef = ref(db, "users/" + user.uid);
+
+  get(userRef).then(snapshot => {
+    let data = snapshot.val();
+    let newBal = isDeposit ? data.balance + amount : data.balance - amount;
 
     if (newBal < 0) return alert("Insufficient balance");
 
-    ref.update({ balance: newBal });
+    update(userRef, { balance: newBal });
 
-    firebase.database().ref("transactions/" + user.uid).push(
-      (isDeposit ? "Deposit: ₹" : "Withdraw: ₹") + amt
-    );
+    alert("Transaction successful");
+    location.reload();
   });
 }
 
-// Logout
-function logout() {
-  firebase.auth().signOut();
+
+// ================= LOGOUT =================
+window.logout = function () {
+  signOut(auth);
   window.location = "index.html";
-}
-
-// Admin Login
-function adminLogin() {
-  let pass = document.getElementById("adminPass").value;
-
-  if (pass === "admin123") {
-    document.getElementById("adminArea").style.display = "block";
-    alert("Admin logged in");
-  } else {
-    alert("Wrong admin password");
-  }
-}
-
-// Admin add balance
-function addBalanceAdmin() {
-  let acc = document.getElementById("adminAcc").value;
-  let amt = Number(document.getElementById("adminAmount").value);
-
-  firebase.database().ref("accounts/" + acc).once("value").then(snap => {
-    if (!snap.exists()) return alert("Account not found");
-
-    let uid = snap.val();
-    let userRef = firebase.database().ref("users/" + uid);
-
-    userRef.once("value").then(s => {
-      let bal = s.val().balance;
-      userRef.update({ balance: bal + amt });
-
-      firebase.database().ref("transactions/" + uid).push(
-        "Admin Added: ₹" + amt
-      );
-
-      alert("Balance added successfully");
-    });
-  });
-}
+};
