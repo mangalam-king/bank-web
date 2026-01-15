@@ -1,21 +1,25 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Bank Dashboard</title>
+  <title>User Dashboard</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<h2>Welcome to Your Bank</h2>
+<h2>User Dashboard</h2>
 
+<p>Account No: <b id="accno"></b></p>
 <h3>Balance: ₹ <span id="balance">0</span></h3>
 
-<input type="number" id="amount" placeholder="Enter amount"><br>
+<input type="number" id="amount" placeholder="Amount"><br>
 
 <button onclick="deposit()">Deposit</button>
 <button onclick="withdraw()">Withdraw</button>
 
-<br><br>
+<h3>Transactions</h3>
+<ul id="history"></ul>
+
+<br>
 <button onclick="logout()">Logout</button>
 
 <script src="firebase.js"></script>
