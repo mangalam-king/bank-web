@@ -1,1 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Panel</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
 
+<h2>Admin Panel</h2>
+
+<input type="text" id="adminPass" placeholder="Admin Password"><br>
+<button onclick="adminLogin()">Login as Admin</button>
+
+<div id="adminArea" style="display:none;">
+  <h3>Add Balance to User</h3>
+
+  <input type="text" id="adminAcc" placeholder="Account Number"><br>
+  <input type="number" id="adminAmount" placeholder="Amount"><br>
+
+  <button onclick="addBalanceAdmin()">Add Balance</button>
+</div>
+
+<script src="firebase.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
